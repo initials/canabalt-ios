@@ -11,7 +11,7 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
-//
+//  
 
 #import <Flixel/Flixel.h>
 
@@ -24,9 +24,32 @@
 @synthesize touchesBegan, touchesEnded, touching;
 @synthesize screenTouchPoint, lastScreenTouchPoint;
 @synthesize screenTouchBeganPoint;
+@synthesize touches, numberOfTouches, multiTouchPhase;
+//@synthesize swipeLeftRecognizer;
+@synthesize swipedDown, swipedUp, swipedLeft, swipedRight;
+@synthesize vcpButton1, vcpButton2, vcpLeftArrow, vcpRightArrow, newTouch;
+
+int previousNumberOfTouches;
+
+
+- (void)dealloc {
+    //[swipeLeftRecognizer release];
+    [super dealloc];
+}
+
+//- (id) init {
+//    recognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeFrom:)];
+//    self.swipeLeftRecognizer = (UISwipeGestureRecognizer *)recognizer;
+//    swipeLeftRecognizer.direction = UISwipeGestureRecognizerDirectionLeft;
+//    self.swipeLeftRecognizer = (UISwipeGestureRecognizer *)recognizer;
+//    [recognizer release];
+//    return YES;
+//}
+
 
 - (void) processTouches:(NSSet *)newTouches
 {
+ 
   BOOL getScreenTouchBeganPoint = NO;
   if ((touches == nil || [touches count] == 0) &&
       (newTouches != nil && [newTouches count] > 0)) {
@@ -38,20 +61,91 @@
     nextTouchesEnded = YES;
   [touches release];
   touches = [newTouches retain];
-
+    //NSLog(@" TOUCHES SET : %@ ", touches);
   nextLastScreenTouchPoint = nextScreenTouchPoint;
   nextScreenTouchPoint = self.internalScreenTouchPoint;
   if (getScreenTouchBeganPoint)
     nextScreenTouchBeganPoint = nextScreenTouchPoint;
   newData = YES;
+
 }
 
 - (void) update
 {
+    //multiTouchPhase = -1;
+    numberOfTouches = [touches count];
   //reset these right away
   touchesBegan = NO;
   touchesEnded = NO;
+    
+    swipedDown=NO;
+    swipedLeft=NO;
+    swipedUp=NO;
+    swipedRight=NO;
+    
+    vcpLeftArrow = NO;
+    vcpRightArrow = NO;
+    vcpButton1 = NO;
+    vcpButton2 = NO;
+
+    if (numberOfTouches > previousNumberOfTouches) {
+        newTouch = YES;
+    }
+    else {
+        newTouch = NO;
+    }
+    
+    if (numberOfTouches == 1 || numberOfTouches == 2) {
+        for(UITouch *singleTouch in touches) {
+            
+            //NSLog(@"%@", singleTouch);
+            CGPoint p = [singleTouch locationInView:(singleTouch.view)];
+            //NSLog(@"%@", NSStringFromCGPoint(p));
+            if (p.y > 400) {
+                vcpLeftArrow = YES;
+                
+            } else if (p.y > 320 && p.y < 399) {
+                vcpRightArrow = YES;
+                
+            } else if (p.y < 80 && p.y > 1  ) { //&& player.onFloor
+                vcpButton2 = YES;
+                
+                
+                
+            }
+            if (p.y > 81 && p.y < 160  ) { 
+                vcpButton1=YES;
+                
+            }
+        }
+    }
+    
+    previousNumberOfTouches = numberOfTouches;
+    
+    
   if (newData) {
+      
+
+      
+      FlxGame * game = [FlxG game];
+      if (game.swipedRight) {
+          swipedRight=YES;
+      }
+      if (game.swipedLeft) {
+          swipedLeft=YES;
+      }
+      if (game.swipedDown) {
+          swipedDown=YES;
+      }
+      if (game.swipedUp) {
+          swipedUp=YES;
+      }
+      
+
+      
+  
+
+      
     touchesBegan = nextTouchesBegan;
     touchesEnded = nextTouchesEnded;
     nextTouchesBegan = NO;
@@ -106,6 +200,7 @@
   //todo: potentially a different point depending upon screen orientation
   //also need to scale by zoom
   FlxGame * game = [FlxG game];
+    
   float z = game.zoom;
   if (FlxG.retinaDisplay)
     z = z/2;

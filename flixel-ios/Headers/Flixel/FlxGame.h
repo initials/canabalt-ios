@@ -11,7 +11,7 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
-//
+// 
 
 #import <OpenGLES/ES1/gl.h>
 
@@ -73,6 +73,16 @@ typedef enum {
   id displayLink;
 
   NSInteger frameInterval;
+
+  BOOL swipedUp;
+  BOOL swipedDown;
+  BOOL swipedLeft;
+  BOOL swipedRight;
+	UISwipeGestureRecognizer *swipeLeftRecognizer;
+	//UISwipeGestureRecognizer *swipeRightRecognizer;
+	UISwipeGestureRecognizer *swipeUpRecognizer;
+	UISwipeGestureRecognizer *swipeDownRecognizer;
+
 }
 
 @property(nonatomic,readonly) float zoom;
@@ -84,6 +94,15 @@ typedef enum {
 @property(nonatomic,assign) BOOL paused;
 @property(nonatomic,assign) NSInteger frameInterval;
 @property(nonatomic,readonly) UIWindow * window;
+@property(nonatomic,readonly)   BOOL swipedUp;
+@property(nonatomic,readonly)   BOOL swipedDown;
+@property(nonatomic,readonly)   BOOL swipedLeft;
+@property(nonatomic,readonly)   BOOL swipedRight;
+@property (nonatomic, retain) UISwipeGestureRecognizer *swipeLeftRecognizer;
+//@property (nonatomic, retain) UISwipeGestureRecognizer *swipeRightRecognizer;
+@property (nonatomic, retain) UISwipeGestureRecognizer *swipeUpRecognizer;
+@property (nonatomic, retain) UISwipeGestureRecognizer *swipeDownRecognizer;
+
 
 - (id) initWithOrientation:(FlxGameOrientation)gameOrientation state:(NSString *)InitialState;
 - (id) initWithOrientation:(FlxGameOrientation)gameOrientation state:(NSString *)InitialState zoom:(float)Zoom;
